@@ -1,230 +1,145 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { CloudArrowUpIcon, HashtagIcon, XMarkIcon } from '@heroicons/react/24/outline'
-import { api } from '@/services/api'
-import { env } from '@/env'
-
-interface UploadForm {
-  caption: string
-  tags: string[]
-  isPublic: boolean
-}
+import { useApi } from '@/hooks/useApi'
+import ProtectedRoute from '@/components/ProtectedRoute'
 
 export default function UploadPage() {
   const router = useRouter()
-  const [file, setFile] = useState<File | null>(null)
-  const [preview, setPreview] = useState<string>('')
+  const api = useApi()
+  const [isUploading, setIsUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
-  const [uploading, setUploading] = useState(false)
-  const [form, setForm] = useState<UploadForm>({
-    caption: '',
-    tags: [],
-    isPublic: true,
-  })
-  const [currentTag, setCurrentTag] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0]
-    if (selectedFile && selectedFile.size <= env.uploadMaxSize) {
-      setFile(selectedFile)
-      // Create video preview
-      const url = URL.createObjectURL(selectedFile)
-      setPreview(url)
-    } else {
-      alert('File is too large. Maximum size is 100MB.')
-    }
-  }
-
-  const addTag = () => {
-    if (currentTag && !form.tags.includes(currentTag)) {
-      setForm(prev => ({
-        ...prev,
-        tags: [...prev.tags, currentTag.toLowerCase()]
-      }))
-      setCurrentTag('')
-    }
-  }
-
-  const removeTag = (tagToRemove: string) => {
-    setForm(prev => ({
-      ...prev,
-      tags: prev.tags.filter(tag => tag !== tagToRemove)
-    }))
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!file || !form.caption) return
-
+    const form = e.currentTarget
+    const formData = new FormData(form)
+    
     try {
-      setUploading(true)
-      // Simulated upload progress
+      setIsUploading(true)
+      setError(null)
+      
+      // Simulate upload progress
       const progressInterval = setInterval(() => {
-        setUploadProgress(prev => {
-          if (prev >= 95) {
-            clearInterval(progressInterval)
-            return prev
-          }
-          return prev + 5
-        })
+        setUploadProgress(prev => Math.min(prev + 10, 90))
       }, 500)
 
-      await api.uploadVideo(file, form.caption)
+      const video = await api.uploadVideo(formData)
       
       clearInterval(progressInterval)
       setUploadProgress(100)
       
-      // Redirect to profile page after successful upload
-      setTimeout(() => {
-        router.push('/profile')
-      }, 1000)
+      // Redirect to the video page
+      router.push(`/video/${video.id}`)
     } catch (error) {
-      console.error('Upload failed:', error)
-      alert('Failed to upload video. Please try again.')
+      setError(error instanceof Error ? error.message : 'Failed to upload video')
+      setUploadProgress(0)
     } finally {
-      setUploading(false)
+      setIsUploading(false)
     }
   }
 
   return (
-    <div className="max-w-md mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">Upload Video</h1>
-      
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Video Upload */}
-        <div className="border-2 border-dashed border-gray-700 rounded-lg p-8 text-center">
-          <input
-            type="file"
-            accept="video/*"
-            onChange={handleFileChange}
-            className="hidden"
-            id="video-upload"
-            disabled={uploading}
-          />
-          <label
-            htmlFor="video-upload"
-            className="cursor-pointer flex flex-col items-center"
-          >
-            {preview ? (
-              <video
-                src={preview}
-                className="w-full max-h-[200px] object-contain mb-4"
-                controls
-              />
-            ) : (
-              <>
-                <CloudArrowUpIcon className="w-12 h-12 text-gray-400 mb-2" />
-                <span className="text-gray-400">Click to upload video</span>
-                <span className="text-gray-500 text-sm mt-1">
-                  Maximum file size: 100MB
-                </span>
-              </>
-            )}
-          </label>
-        </div>
+    <ProtectedRoute>
+      <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black pt-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-gray-900 rounded-xl shadow-lg p-6 mb-8">
+            <h1 className="text-2xl font-bold text-emerald-400 mb-6">Upload Video</h1>
+            
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Video File Input */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Video
+                </label>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  name="video"
+                  accept="video/*"
+                  required
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+              </div>
 
-        {/* Caption */}
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            Caption
-          </label>
-          <textarea
-            value={form.caption}
-            onChange={(e) => setForm(prev => ({ ...prev, caption: e.target.value }))}
-            className="w-full px-3 py-2 bg-gray-900 rounded-lg border border-gray-700 focus:border-green-500 focus:ring-1 focus:ring-green-500"
-            rows={3}
-            placeholder="Describe your video..."
-            disabled={uploading}
-          />
-        </div>
+              {/* Caption */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Caption
+                </label>
+                <textarea
+                  name="caption"
+                  required
+                  rows={3}
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  placeholder="Write a caption for your video..."
+                />
+              </div>
 
-        {/* Tags */}
-        <div>
-          <label className="block text-sm font-medium mb-2">
-            Tags
-          </label>
-          <div className="flex gap-2 mb-2 flex-wrap">
-            {form.tags.map(tag => (
-              <span
-                key={tag}
-                className="bg-gray-800 px-2 py-1 rounded-full text-sm flex items-center gap-1"
-              >
-                #{tag}
-                <button
-                  type="button"
-                  onClick={() => removeTag(tag)}
-                  className="hover:text-red-500"
-                  disabled={uploading}
+              {/* Tags */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Tags (comma separated)
+                </label>
+                <input
+                  type="text"
+                  name="tags"
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  placeholder="education, medical, tutorial"
+                />
+              </div>
+
+              {/* Privacy */}
+              <div>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Privacy
+                </label>
+                <select
+                  name="isPublic"
+                  className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
                 >
-                  <XMarkIcon className="w-4 h-4" />
-                </button>
-              </span>
-            ))}
-          </div>
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <HashtagIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                value={currentTag}
-                onChange={(e) => setCurrentTag(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && addTag()}
-                className="w-full pl-10 pr-3 py-2 bg-gray-900 rounded-lg border border-gray-700 focus:border-green-500 focus:ring-1 focus:ring-green-500"
-                placeholder="Add tags..."
-                disabled={uploading}
-              />
-            </div>
-            <button
-              type="button"
-              onClick={addTag}
-              className="px-4 py-2 bg-gray-800 rounded-lg hover:bg-gray-700"
-              disabled={uploading}
-            >
-              Add
-            </button>
+                  <option value="true">Public</option>
+                  <option value="false">Private</option>
+                </select>
+              </div>
+
+              {/* Error Message */}
+              {error && (
+                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+                  <p className="text-red-400 text-sm">{error}</p>
+                </div>
+              )}
+
+              {/* Upload Progress */}
+              {isUploading && (
+                <div className="space-y-2">
+                  <div className="h-2 bg-gray-800 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-emerald-500 transition-all duration-500"
+                      style={{ width: `${uploadProgress}%` }}
+                    />
+                  </div>
+                  <p className="text-sm text-gray-400 text-center">
+                    Uploading... {uploadProgress}%
+                  </p>
+                </div>
+              )}
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={isUploading}
+                className="w-full py-3 px-4 bg-emerald-500 text-white font-medium rounded-lg hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {isUploading ? 'Uploading...' : 'Upload Video'}
+              </button>
+            </form>
           </div>
         </div>
-
-        {/* Privacy Setting */}
-        <div>
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={form.isPublic}
-              onChange={(e) => setForm(prev => ({ ...prev, isPublic: e.target.checked }))}
-              className="rounded border-gray-700 bg-gray-900 text-green-500 focus:ring-green-500"
-              disabled={uploading}
-            />
-            <span className="text-sm">Make this video public</span>
-          </label>
-        </div>
-
-        {/* Upload Progress */}
-        {uploading && (
-          <div className="space-y-2">
-            <div className="h-2 bg-gray-900 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-green-500 transition-all duration-500"
-                style={{ width: `${uploadProgress}%` }}
-              />
-            </div>
-            <p className="text-sm text-gray-400 text-center">
-              Uploading... {uploadProgress}%
-            </p>
-          </div>
-        )}
-
-        {/* Submit Button */}
-        <button
-          type="submit"
-          disabled={!file || !form.caption || uploading}
-          className="w-full bg-green-500 text-white py-3 px-4 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {uploading ? 'Uploading...' : 'Post Video'}
-        </button>
-      </form>
-    </div>
+      </div>
+    </ProtectedRoute>
   )
 } 

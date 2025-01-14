@@ -2,19 +2,20 @@ import { NextRequest, NextResponse } from 'next/server'
 import { User, Video, PaginatedResponse, ApiError } from '@/types'
 
 // Temporary mock data - replace with database queries
-const MOCK_USERS: User[] = [
-  {
+const MOCK_USERS: Record<string, User> = {
+  '1': {
     id: '1',
     username: '@cannabisexpert',
+    email: 'expert@example.com',
     avatar: 'https://storage.googleapis.com/your-bucket/avatar1.jpg',
     bio: 'Cannabis educator and advocate. Sharing knowledge about medical benefits and responsible use. 🌿',
     followers: 12500,
     following: 850,
     totalLikes: 45200,
-    createdAt: new Date().toISOString(),
-  },
-  // Add more mock users as needed
-]
+    emailVerified: true,
+    createdAt: new Date('2024-01-01T00:00:00.000Z'),
+  }
+}
 
 // Import mock videos from the videos endpoint
 const MOCK_VIDEOS: Video[] = [
@@ -57,7 +58,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = MOCK_USERS.find(u => u.id === params.id)
+    const user = MOCK_USERS[params.id]
 
     if (!user) {
       const error: ApiError = {

@@ -17,15 +17,16 @@ export default function ProfilePage() {
 
   // Load user's videos
   useEffect(() => {
-    if (user) {
+    if (user?.id) {
       loadUserVideos()
     }
-  }, [user])
+  }, [user?.id])
 
   const loadUserVideos = async () => {
+    if (!user?.id) return
     try {
       setIsLoading(true)
-      const response = await api.getUserVideos(user!.id)
+      const response = await api.getUserVideos(user.id)
       setUserVideos(response.data)
     } catch (error) {
       console.error('Failed to load videos:', error)
@@ -34,15 +35,18 @@ export default function ProfilePage() {
     }
   }
 
-  const handleProfileUpdate = async (updates: Partial<typeof user>) => {
+  const handleProfileUpdate = async (updates: Partial<NonNullable<typeof user>>) => {
+    if (!user?.id) return
     try {
-      await api.updateUser(user!.id, updates)
+      await api.updateUser(user.id, updates)
       // In a real app, you would update the user state here
       setIsEditModalOpen(false)
     } catch (error) {
       console.error('Failed to update profile:', error)
     }
   }
+
+  if (!user) return null
 
   return (
     <ProtectedRoute>

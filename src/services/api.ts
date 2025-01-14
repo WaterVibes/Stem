@@ -3,6 +3,17 @@ import { Video, User, PaginatedResponse } from '@/types'
 class Api {
   private baseUrl = '/api'
 
+  async getCurrentUser(): Promise<User | null> {
+    try {
+      const response = await fetch(`${this.baseUrl}/auth/me`)
+      if (!response.ok) return null
+      return response.json()
+    } catch (error) {
+      console.error('Failed to get current user:', error)
+      return null
+    }
+  }
+
   async getVideos(page = 1, limit = 10): Promise<PaginatedResponse<Video[]>> {
     const response = await fetch(`${this.baseUrl}/videos?page=${page}&limit=${limit}`)
     if (!response.ok) throw new Error('Failed to fetch videos')
@@ -46,6 +57,14 @@ class Api {
       method: 'DELETE',
     })
     if (!response.ok) throw new Error('Failed to unlike video')
+  }
+
+  async toggleVideoLike(videoId: string, liked: boolean): Promise<void> {
+    if (liked) {
+      await this.likeVideo(videoId)
+    } else {
+      await this.unlikeVideo(videoId)
+    }
   }
 
   async getComments(videoId: string): Promise<Comment[]> {
