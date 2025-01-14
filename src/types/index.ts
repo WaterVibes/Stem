@@ -29,6 +29,17 @@ export interface Video {
   }
 }
 
+export interface Comment {
+  id: string
+  content: string
+  user: {
+    id: string
+    username: string
+    avatar: string
+  }
+  createdAt: string
+}
+
 export interface PaginatedResponse<T> {
   data: T
   pagination: {

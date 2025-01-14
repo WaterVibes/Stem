@@ -3,17 +3,8 @@
 import { useState, useEffect } from 'react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
 import { formatDistanceToNow } from 'date-fns'
-
-interface Comment {
-  id: string
-  content: string
-  user: {
-    id: string
-    username: string
-    avatar: string
-  }
-  createdAt: string
-}
+import { Comment } from '@/types'
+import { api } from '@/services/api'
 
 interface CommentsModalProps {
   videoId: string
@@ -34,9 +25,7 @@ export default function CommentsModal({ videoId, onClose }: CommentsModalProps) 
   const loadComments = async () => {
     try {
       setIsLoading(true)
-      const response = await fetch(`/api/videos/${videoId}/comments`)
-      if (!response.ok) throw new Error('Failed to load comments')
-      const data = await response.json()
+      const data = await api.getComments(videoId)
       setComments(data)
     } catch (error) {
       console.error('Failed to load comments:', error)
@@ -51,15 +40,7 @@ export default function CommentsModal({ videoId, onClose }: CommentsModalProps) 
 
     try {
       setIsSubmitting(true)
-      const response = await fetch(`/api/videos/${videoId}/comments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: newComment.trim() })
-      })
-
-      if (!response.ok) throw new Error('Failed to add comment')
-      
-      const comment = await response.json()
+      const comment = await api.addComment(videoId, newComment.trim())
       setComments(prev => [comment, ...prev])
       setNewComment('')
     } catch (error) {
@@ -97,7 +78,7 @@ export default function CommentsModal({ videoId, onClose }: CommentsModalProps) 
               </div>
             ))
           ) : comments.length > 0 ? (
-            comments.map((comment: Comment) => (
+            comments.map((comment) => (
               <div key={comment.id} className="flex gap-3 mb-4">
                 <img
                   src={comment.user.avatar}

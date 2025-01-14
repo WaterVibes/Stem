@@ -1,4 +1,4 @@
-import { Video, User, PaginatedResponse } from '@/types'
+import { Video, User, PaginatedResponse, Comment } from '@/types'
 
 class Api {
   private baseUrl = '/api'
