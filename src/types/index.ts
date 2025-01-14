@@ -1,42 +1,68 @@
 export interface User {
   id: string
   username: string
-  avatar: string
+  email: string
+  avatar?: string
   bio?: string
-  followers?: number
-  following?: number
+  followers: number
+  following: number
+  totalLikes: number
+  emailVerified: boolean
+  createdAt: Date
 }
 
 export interface Video {
   id: string
   url: string
+  thumbnail: string
   caption: string
-  user: User
+  tags: string[]
   likes: number
   comments: number
-  shares?: number
+  shares: number
   createdAt: string
-  duration?: number
-  thumbnail?: string
-  tags?: string[]
+  updatedAt?: string
+  user: {
+    id: string
+    username: string
+    avatar: string
+  }
 }
 
-export interface Comment {
-  id: string
-  content: string
-  user: User
-  createdAt: string
-  likes?: number
-}
-
-export interface ApiResponse<T> {
+export interface PaginatedResponse<T> {
   data: T
-  message?: string
-  error?: string
+  pagination: {
+    page: number
+    limit: number
+    totalCount: number
+    totalPages: number
+    hasMore: boolean
+  }
 }
 
-export interface PaginatedResponse<T> extends ApiResponse<T> {
-  page: number
-  totalPages: number
-  hasMore: boolean
+export interface ApiError {
+  error: string
+  status: number
+  message?: string
+}
+
+export interface VideoMetrics {
+  views: number
+  watchTime: number
+  completionRate: number
+  engagementScore: number
+  trendingScore: number
+  lastUpdated: string
+}
+
+export interface VideoWithMetrics extends Video {
+  metrics: VideoMetrics
+}
+
+export type SortOption = 'trending' | 'recent' | 'popular'
+
+export interface FeedFilters {
+  sort: SortOption
+  tags?: string[]
+  timeRange?: 'day' | 'week' | 'month' | 'all'
 } 

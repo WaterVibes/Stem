@@ -1,77 +1,128 @@
-import { env } from '@/env'
-import { User, Video, Comment, ApiResponse, PaginatedResponse } from '@/types'
+import { User, Video, PaginatedResponse } from '@/types'
 
-interface ApiOptions {
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
-  body?: any
-  headers?: Record<string, string>
-}
-
-class ApiService {
-  private baseUrl: string
-
-  constructor() {
-    this.baseUrl = env.apiUrl
-  }
-
-  private async request<T>(endpoint: string, options: ApiOptions = {}): Promise<T> {
-    const {
-      method = 'GET',
-      body,
-      headers = {},
-    } = options
-
-    const response = await fetch(`${this.baseUrl}${endpoint}`, {
-      method,
-      headers: {
-        'Content-Type': 'application/json',
-        ...headers,
-      },
-      body: body ? JSON.stringify(body) : undefined,
-    })
-
+export class ApiService {
+  // Get videos with pagination
+  async getVideos(page = 1, limit = 10): Promise<PaginatedResponse<Video[]>> {
+    const response = await fetch(`/api/videos?page=${page}&limit=${limit}`)
     if (!response.ok) {
-      throw new Error(`API Error: ${response.statusText}`)
+      throw new Error('Failed to fetch videos')
     }
-
     return response.json()
   }
 
-  // Videos
-  async getFeed(page: number = 1): Promise<PaginatedResponse<Video[]>> {
-    return this.request('/videos/feed', { 
-      method: 'GET',
-      headers: { page: page.toString() }
-    })
+  // Get user's profile and videos
+  async getUserProfile(userId: string, includeVideos = false, page = 1, limit = 12): Promise<PaginatedResponse<{ user: User; videos: Video[] }> | User> {
+    const params = new URLSearchParams()
+    if (includeVideos) {
+      params.set('include', 'videos')
+      params.set('page', page.toString())
+      params.set('limit', limit.toString())
+    }
+
+    const response = await fetch(`/api/users/${userId}?${params}`)
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.message || 'Failed to fetch user')
+    }
+    return response.json()
   }
 
-  async uploadVideo(file: File, caption: string): Promise<ApiResponse<Video>> {
+  // Get user's videos with pagination
+  async getUserVideos(userId: string, page = 1, limit = 12): Promise<PaginatedResponse<Video[]>> {
+    const response = await fetch(`/api/users/${userId}/videos?page=${page}&limit=${limit}`)
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.message || 'Failed to fetch user videos')
+    }
+    return response.json()
+  }
+
+  // Update user profile
+  async updateUser(userId: string, updates: Partial<User>): Promise<User> {
+    const response = await fetch(`/api/users/${userId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updates),
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.message || 'Failed to update user')
+    }
+    return response.json()
+  }
+
+  // Upload avatar
+  async uploadAvatar(userId: string, file: File): Promise<{ url: string }> {
     const formData = new FormData()
-    formData.append('video', file)
-    formData.append('caption', caption)
-    
-    return this.request('/videos/upload', {
+    formData.append('avatar', file)
+
+    const response = await fetch(`/api/users/${userId}/avatar`, {
       method: 'POST',
       body: formData,
     })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.message || 'Failed to upload avatar')
+    }
+    return response.json()
   }
 
-  // User
-  async getCurrentUser(): Promise<ApiResponse<User>> {
-    return this.request('/user/me')
+  // Get a single video by ID
+  async getVideo(id: string): Promise<Video> {
+    const response = await fetch(`/api/videos/${id}`)
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.message || 'Failed to fetch video')
+    }
+    return response.json()
   }
 
-  // Interactions
-  async likeVideo(videoId: string): Promise<ApiResponse<{ likes: number }>> {
-    return this.request(`/videos/${videoId}/like`, { method: 'POST' })
-  }
-
-  async addComment(videoId: string, content: string): Promise<ApiResponse<Comment>> {
-    return this.request(`/videos/${videoId}/comments`, {
+  // Upload a new video
+  async uploadVideo(formData: FormData): Promise<Video> {
+    const response = await fetch('/api/videos/upload', {
       method: 'POST',
-      body: { content },
+      body: formData,
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.message || 'Failed to upload video')
+    }
+    return response.json()
+  }
+
+  // Update a video
+  async updateVideo(id: string, updates: Partial<Video>): Promise<Video> {
+    const response = await fetch(`/api/videos/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updates),
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.message || 'Failed to update video')
+    }
+    return response.json()
+  }
+
+  // Delete a video
+  async deleteVideo(id: string): Promise<void> {
+    const response = await fetch(`/api/videos/${id}`, {
+      method: 'DELETE',
+    })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.message || 'Failed to delete video')
+    }
+  }
+
+  // Like/unlike a video
+  async toggleVideoLike(id: string, liked: boolean): Promise<Video> {
+    return this.updateVideo(id, {
+      likes: liked ? 1 : -1, // This would be handled properly on the server
     })
   }
-}
-
-export const api = new ApiService() 
+} 

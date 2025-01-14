@@ -10,8 +10,14 @@ export const env = {
   // Feature Flags
   enableLiveStreaming: process.env.NEXT_PUBLIC_ENABLE_LIVE_STREAMING === 'true',
   enableComments: process.env.NEXT_PUBLIC_ENABLE_COMMENTS === 'true',
+
+  // Storage Configuration
+  STORAGE_PROVIDER: process.env.STORAGE_PROVIDER || 'mock',
+  AWS_BUCKET_NAME: process.env.AWS_BUCKET_NAME,
+  AWS_REGION: process.env.AWS_REGION,
+  GCS_BUCKET_NAME: process.env.GCS_BUCKET_NAME,
 } as const
 
 // Type checking to ensure all environment variables are defined
-type EnvCheck = Record<keyof typeof env, string | number | boolean>
+type EnvCheck = Record<keyof typeof env, string | number | boolean | undefined>
 export type Env = typeof env 

@@ -1,84 +1,151 @@
 'use client'
 
-import { useStore } from '@/store/useStore'
-import { User, Video } from '@/types'
-import { formatNumber } from '@/utils/format'
-
-// Temporary mock data
-const MOCK_VIDEOS: Video[] = [
-  {
-    id: '1',
-    url: '/video1.mp4',
-    thumbnail: '/thumbnail1.jpg',
-    caption: 'First review 🌿',
-    user: {
-      id: '1',
-      username: '@cannabisexpert',
-      avatar: '/avatar1.jpg'
-    },
-    likes: 1200,
-    comments: 45,
-    createdAt: new Date().toISOString()
-  },
-  // Add more mock videos as needed
-]
+import { useState, useEffect } from 'react'
+import { useApi } from '@/hooks/useApi'
+import { Video } from '@/types'
+import { PencilIcon } from '@heroicons/react/24/outline'
+import EditProfileModal from '@/components/EditProfileModal'
+import ProtectedRoute from '@/components/ProtectedRoute'
+import { useAuthStore } from '@/store/useAuthStore'
 
 export default function ProfilePage() {
-  const currentUser = useStore((state: { currentUser: User | null }) => state.currentUser)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [userVideos, setUserVideos] = useState<Video[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const { user } = useAuthStore()
+  const api = useApi()
 
-  if (!currentUser) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p>Please log in to view your profile</p>
-      </div>
-    )
+  // Load user's videos
+  useEffect(() => {
+    if (user) {
+      loadUserVideos()
+    }
+  }, [user])
+
+  const loadUserVideos = async () => {
+    try {
+      setIsLoading(true)
+      const response = await api.getUserVideos(user!.id)
+      setUserVideos(response.data)
+    } catch (error) {
+      console.error('Failed to load videos:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleProfileUpdate = async (updates: Partial<typeof user>) => {
+    try {
+      await api.updateUser(user!.id, updates)
+      // In a real app, you would update the user state here
+      setIsEditModalOpen(false)
+    } catch (error) {
+      console.error('Failed to update profile:', error)
+    }
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      {/* Profile Header */}
-      <div className="text-center mb-8">
-        <div className="w-24 h-24 rounded-full mx-auto mb-4 overflow-hidden">
-          <img
-            src={currentUser.avatar}
-            alt={currentUser.username}
-            className="w-full h-full object-cover"
-          />
-        </div>
-        <h1 className="text-xl font-bold">{currentUser.username}</h1>
-        
-        {/* Stats */}
-        <div className="flex justify-center gap-6 mt-4">
-          <div className="text-center">
-            <div className="font-bold">{formatNumber(1234)}</div>
-            <div className="text-sm text-gray-400">Followers</div>
-          </div>
-          <div className="text-center">
-            <div className="font-bold">{formatNumber(567)}</div>
-            <div className="text-sm text-gray-400">Following</div>
-          </div>
-          <div className="text-center">
-            <div className="font-bold">{formatNumber(89)}</div>
-            <div className="text-sm text-gray-400">Videos</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Video Grid */}
-      <div className="grid grid-cols-3 gap-1">
-        {MOCK_VIDEOS.map((video) => (
-          <div key={video.id} className="aspect-square relative">
+    <ProtectedRoute>
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        {/* Profile Header */}
+        <div className="flex items-start gap-8 mb-12">
+          {/* Avatar */}
+          <div className="relative">
             <img
-              src={video.thumbnail || video.url}
-              alt={video.caption}
-              className="w-full h-full object-cover"
+              src={user?.avatar || '/default-avatar.png'}
+              alt={user?.username}
+              className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
             />
-            <div className="absolute bottom-1 left-1 text-xs text-white">
-              {formatNumber(video.likes)} likes
-            </div>
           </div>
-        ))}
+
+          {/* User Info */}
+          <div className="flex-1">
+            <div className="flex items-center justify-between mb-4">
+              <h1 className="text-2xl font-bold">{user?.username}</h1>
+              <button
+                onClick={() => setIsEditModalOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+              >
+                <PencilIcon className="w-5 h-5" />
+                Edit Profile
+              </button>
+            </div>
+
+            {/* Stats */}
+            <div className="flex gap-8 mb-4">
+              <div className="text-center">
+                <div className="font-bold">{userVideos.length}</div>
+                <div className="text-gray-600 text-sm">Videos</div>
+              </div>
+              <div className="text-center">
+                <div className="font-bold">{user?.followers?.toLocaleString()}</div>
+                <div className="text-gray-600 text-sm">Followers</div>
+              </div>
+              <div className="text-center">
+                <div className="font-bold">{user?.following?.toLocaleString()}</div>
+                <div className="text-gray-600 text-sm">Following</div>
+              </div>
+              <div className="text-center">
+                <div className="font-bold">{user?.totalLikes?.toLocaleString()}</div>
+                <div className="text-gray-600 text-sm">Likes</div>
+              </div>
+            </div>
+
+            {/* Bio */}
+            <p className="text-gray-700 whitespace-pre-wrap">{user?.bio}</p>
+          </div>
+        </div>
+
+        {/* Video Grid */}
+        <div className="grid grid-cols-3 gap-4">
+          {isLoading ? (
+            // Loading skeleton
+            Array.from({ length: 6 }).map((_, i) => (
+              <div
+                key={i}
+                className="aspect-[9/16] bg-gray-200 rounded-lg animate-pulse"
+              />
+            ))
+          ) : userVideos.length > 0 ? (
+            userVideos.map(video => (
+              <div
+                key={video.id}
+                className="aspect-[9/16] relative rounded-lg overflow-hidden group cursor-pointer"
+              >
+                {/* Thumbnail */}
+                <img
+                  src={video.thumbnail}
+                  alt={video.caption}
+                  className="w-full h-full object-cover"
+                />
+
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <div className="text-white text-center">
+                    <div className="font-bold text-xl">{video.likes.toLocaleString()}</div>
+                    <div className="text-sm">likes</div>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            // Empty state
+            <div className="col-span-3 py-12 text-center text-gray-500">
+              <p className="text-lg">No videos yet</p>
+              <p className="text-sm mt-2">Your uploaded videos will appear here</p>
+            </div>
+          )}
+        </div>
+
+        {/* Edit Profile Modal */}
+        {isEditModalOpen && (
+          <EditProfileModal
+            user={user!}
+            onClose={() => setIsEditModalOpen(false)}
+            onSave={handleProfileUpdate}
+          />
+        )}
       </div>
-    </div>
+    </ProtectedRoute>
   )
 } 
