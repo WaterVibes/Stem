@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { User, Video, PaginatedResponse, ApiError } from '@/types'
 
-// Temporary mock data - replace with database queries
+// Mock user data - replace with real database
 const MOCK_USERS: Record<string, User> = {
   '1': {
     id: '1',
@@ -17,7 +17,7 @@ const MOCK_USERS: Record<string, User> = {
   }
 }
 
-// Import mock videos from the videos endpoint
+// Mock videos - replace with real database
 const MOCK_VIDEOS: Video[] = [
   {
     id: '1',
@@ -120,9 +120,9 @@ export async function PATCH(
 ) {
   try {
     const updates = await request.json()
-    const userIndex = MOCK_USERS.findIndex(u => u.id === params.id)
+    const user = MOCK_USERS[params.id]
 
-    if (userIndex === -1) {
+    if (!user) {
       const error: ApiError = {
         error: 'User not found',
         status: 404,
@@ -144,19 +144,15 @@ export async function PATCH(
       return NextResponse.json(error, { status: error.status })
     }
 
-    // In a real app, you would:
-    // 1. Validate the user's session
-    // 2. Validate the update data (username uniqueness, etc.)
-    // 3. Update the database
-    // 4. Return the updated user
-
+    // Update user data
     const updatedUser = {
-      ...MOCK_USERS[userIndex],
+      ...user,
       ...updates,
       updatedAt: new Date().toISOString()
     }
 
-    MOCK_USERS[userIndex] = updatedUser
+    // In a real app, you would update the database here
+    MOCK_USERS[params.id] = updatedUser
 
     return NextResponse.json(updatedUser)
   } catch (error) {
