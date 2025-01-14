@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useApi } from '@/hooks/useApi'
-import { Video } from '@/types'
+import { Video, User } from '@/types'
 import { PencilIcon } from '@heroicons/react/24/outline'
 import EditProfileModal from '@/components/EditProfileModal'
 import ProtectedRoute from '@/components/ProtectedRoute'
@@ -35,7 +35,7 @@ export default function ProfilePage() {
     }
   }
 
-  const handleProfileUpdate = async (updates: Partial<NonNullable<typeof user>>) => {
+  const handleProfileUpdate = async (updates: Partial<User>) => {
     if (!user?.id) return
     try {
       await api.updateUser(user.id, updates)
@@ -56,8 +56,8 @@ export default function ProfilePage() {
           {/* Avatar */}
           <div className="relative">
             <img
-              src={user?.avatar || '/default-avatar.png'}
-              alt={user?.username}
+              src={user.avatar || '/default-avatar.png'}
+              alt={user.username}
               className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
             />
           </div>
@@ -65,7 +65,7 @@ export default function ProfilePage() {
           {/* User Info */}
           <div className="flex-1">
             <div className="flex items-center justify-between mb-4">
-              <h1 className="text-2xl font-bold">{user?.username}</h1>
+              <h1 className="text-2xl font-bold">{user.username}</h1>
               <button
                 onClick={() => setIsEditModalOpen(true)}
                 className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
@@ -82,21 +82,21 @@ export default function ProfilePage() {
                 <div className="text-gray-600 text-sm">Videos</div>
               </div>
               <div className="text-center">
-                <div className="font-bold">{user?.followers?.toLocaleString()}</div>
+                <div className="font-bold">{user.followers.toLocaleString()}</div>
                 <div className="text-gray-600 text-sm">Followers</div>
               </div>
               <div className="text-center">
-                <div className="font-bold">{user?.following?.toLocaleString()}</div>
+                <div className="font-bold">{user.following.toLocaleString()}</div>
                 <div className="text-gray-600 text-sm">Following</div>
               </div>
               <div className="text-center">
-                <div className="font-bold">{user?.totalLikes?.toLocaleString()}</div>
+                <div className="font-bold">{user.totalLikes.toLocaleString()}</div>
                 <div className="text-gray-600 text-sm">Likes</div>
               </div>
             </div>
 
             {/* Bio */}
-            <p className="text-gray-700 whitespace-pre-wrap">{user?.bio}</p>
+            <p className="text-gray-700 whitespace-pre-wrap">{user.bio}</p>
           </div>
         </div>
 
@@ -144,7 +144,7 @@ export default function ProfilePage() {
         {/* Edit Profile Modal */}
         {isEditModalOpen && (
           <EditProfileModal
-            user={user!}
+            user={user}
             onClose={() => setIsEditModalOpen(false)}
             onSave={handleProfileUpdate}
           />

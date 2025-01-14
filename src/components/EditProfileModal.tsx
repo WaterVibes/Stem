@@ -2,16 +2,7 @@
 
 import { useState } from 'react'
 import { XMarkIcon } from '@heroicons/react/24/outline'
-
-interface User {
-  id: string
-  username: string
-  avatar: string
-  bio: string
-  followers: number
-  following: number
-  totalLikes: number
-}
+import { User } from '@/types'
 
 interface EditProfileModalProps {
   user: User
@@ -20,115 +11,99 @@ interface EditProfileModalProps {
 }
 
 export default function EditProfileModal({ user, onClose, onSave }: EditProfileModalProps) {
-  const [isLoading, setIsLoading] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     username: user.username,
-    bio: user.bio,
-    avatar: user.avatar,
+    bio: user.bio || '',
+    avatar: user.avatar || ''
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (isLoading) return
+    if (isSubmitting) return
 
     try {
-      setIsLoading(true)
+      setIsSubmitting(true)
       await onSave(formData)
+      onClose()
     } catch (error) {
       console.error('Failed to update profile:', error)
     } finally {
-      setIsLoading(false)
+      setIsSubmitting(false)
     }
   }
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    // In a real app, you would upload this to your storage service
-    const imageUrl = URL.createObjectURL(file)
-    setFormData(prev => ({ ...prev, avatar: imageUrl }))
-  }
-
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl w-full max-w-md p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold">Edit Profile</h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div className="relative w-full max-w-lg bg-gray-900 rounded-xl shadow-xl">
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-gray-800">
+          <h2 className="text-lg font-semibold text-emerald-400">Edit Profile</h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-1 rounded-lg text-gray-400 hover:text-emerald-400 hover:bg-emerald-500/5 transition-colors"
           >
             <XMarkIcon className="w-6 h-6" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Avatar Upload */}
-          <div className="flex flex-col items-center gap-4">
-            <div className="relative">
-              <img
-                src={formData.avatar}
-                alt={formData.username}
-                className="w-24 h-24 rounded-full object-cover"
-              />
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="absolute inset-0 opacity-0 cursor-pointer"
-              />
-              <div className="absolute inset-0 bg-black/40 rounded-full opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center text-white text-sm">
-                Change Photo
-              </div>
-            </div>
-          </div>
-
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="p-4 space-y-4">
           {/* Username */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Username
             </label>
             <input
               type="text"
               value={formData.username}
-              onChange={e => setFormData(prev => ({ ...prev, username: e.target.value }))}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Enter your username"
+              onChange={(e) => setFormData(prev => ({ ...prev, username: e.target.value }))}
+              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
               required
             />
           </div>
 
           {/* Bio */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
               Bio
             </label>
             <textarea
               value={formData.bio}
-              onChange={e => setFormData(prev => ({ ...prev, bio: e.target.value }))}
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Tell us about yourself"
-              rows={4}
+              onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
+              rows={3}
+              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            />
+          </div>
+
+          {/* Avatar URL */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Avatar URL
+            </label>
+            <input
+              type="url"
+              value={formData.avatar}
+              onChange={(e) => setFormData(prev => ({ ...prev, avatar: e.target.value }))}
+              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
 
           {/* Submit Button */}
-          <div className="flex justify-end gap-4">
+          <div className="flex justify-end gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-              disabled={isLoading}
+              className="px-4 py-2 text-gray-300 hover:text-emerald-400 hover:bg-emerald-500/5 rounded-lg transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
-              disabled={isLoading}
+              disabled={isSubmitting}
+              className="px-4 py-2 bg-emerald-500 text-white font-medium rounded-lg hover:bg-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {isLoading ? 'Saving...' : 'Save Changes'}
+              {isSubmitting ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         </form>
