@@ -1,15 +1,6 @@
-export interface AuthUser {
-  id: string
-  email: string
-  username: string
-  avatar?: string
-  emailVerified: boolean
-  createdAt: Date
-  bio?: string
-  followers: number
-  following: number
-  totalLikes: number
-}
+import { User } from '@/types'
+
+export type AuthUser = User
 
 export interface LoginCredentials {
   email: string

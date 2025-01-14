@@ -1,48 +1,54 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
 
 interface UseInfiniteScrollOptions {
   threshold?: number
-  onLoadMore: () => Promise<void>
+  rootMargin?: string
 }
 
-export function useInfiniteScroll({ 
-  threshold = 0.8,
-  onLoadMore 
-}: UseInfiniteScrollOptions) {
-  const [loading, setLoading] = useState(false)
-  const observerRef = useRef<IntersectionObserver>()
-  const targetRef = useRef<HTMLDivElement>(null)
+export function useInfiniteScroll(
+  onIntersect: () => void,
+  options: UseInfiniteScrollOptions = {}
+) {
+  const { threshold = 0.5, rootMargin = '100px' } = options
+  const observerRef = useRef<IntersectionObserver | null>(null)
+  const targetRef = useRef<HTMLDivElement | null>(null)
 
-  useEffect(() => {
-    const options = {
-      root: null,
-      rootMargin: '0px',
-      threshold,
-    }
-
-    const handleIntersect = async (entries: IntersectionObserverEntry[]) => {
-      const [entry] = entries
-      if (entry.isIntersecting && !loading) {
-        setLoading(true)
-        await onLoadMore()
-        setLoading(false)
+  const setTargetRef = useCallback((node: HTMLDivElement | null) => {
+    if (targetRef.current) {
+      // Cleanup old observer
+      if (observerRef.current) {
+        observerRef.current.disconnect()
       }
     }
 
-    if (targetRef.current) {
-      observerRef.current = new IntersectionObserver(handleIntersect, options)
-      observerRef.current.observe(targetRef.current)
-    }
+    if (node) {
+      // Create new observer
+      const observer = new IntersectionObserver(
+        (entries) => {
+          const [entry] = entries
+          if (entry.isIntersecting) {
+            onIntersect()
+          }
+        },
+        {
+          threshold,
+          rootMargin,
+        }
+      )
 
+      observer.observe(node)
+      observerRef.current = observer
+      targetRef.current = node
+    }
+  }, [onIntersect, threshold, rootMargin])
+
+  useEffect(() => {
     return () => {
       if (observerRef.current) {
         observerRef.current.disconnect()
       }
     }
-  }, [threshold, onLoadMore, loading])
+  }, [])
 
-  return {
-    targetRef,
-    loading,
-  }
+  return setTargetRef
 } 

@@ -1,8 +1,5 @@
-import { ApiService } from '@/services/api'
-
-// Create a singleton instance of the API service
-const apiService = new ApiService()
+import { api } from '@/services/api'
 
 export function useApi() {
-  return apiService
+  return api
 } 
