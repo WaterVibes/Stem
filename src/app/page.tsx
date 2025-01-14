@@ -13,7 +13,10 @@ export default function Home() {
     const fetchUser = async () => {
       try {
         const user = await api.getCurrentUser()
-        setCurrentUser(user)
+        // Only set the user if we got one back
+        if (user) {
+          setCurrentUser(user)
+        }
       } catch (error) {
         console.error('Failed to fetch user:', error)
       }

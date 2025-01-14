@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { Video } from '@/types'
+import { Video, PaginatedResponse, ApiError } from '@/types'
 
-// Temporary mock data - replace with database queries later
+// Mock video data - replace with real database
 const MOCK_VIDEOS: Video[] = [
   {
     id: '1',
@@ -30,49 +30,98 @@ const MOCK_VIDEOS: Video[] = [
     shares: 25,
     createdAt: new Date().toISOString(),
     user: {
-      id: '2',
-      username: '@dr.green',
-      avatar: 'https://storage.googleapis.com/your-bucket/avatar2.jpg',
+      id: '1',
+      username: '@cannabisexpert',
+      avatar: 'https://storage.googleapis.com/your-bucket/avatar1.jpg',
     }
   },
-  // Add more mock videos as needed
 ]
 
 export async function GET(request: NextRequest) {
   try {
-    // Get pagination parameters from URL
+    // Get pagination parameters
     const searchParams = request.nextUrl.searchParams
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
+    const sort = searchParams.get('sort') || 'trending'
+    const timeRange = searchParams.get('timeRange') || 'all'
+    const tags = searchParams.getAll('tags')
+
+    // Calculate offset
     const offset = (page - 1) * limit
 
-    // Get total count
-    const totalVideos = MOCK_VIDEOS.length
+    // Filter and sort videos
+    let filteredVideos = [...MOCK_VIDEOS]
 
-    // Get paginated videos
-    const videos = MOCK_VIDEOS.slice(offset, offset + limit)
+    // Apply tag filters
+    if (tags.length > 0) {
+      filteredVideos = filteredVideos.filter(video =>
+        tags.some(tag => video.tags.includes(tag))
+      )
+    }
 
-    // Calculate pagination metadata
+    // Apply time range filter
+    if (timeRange !== 'all') {
+      const now = new Date()
+      const ranges = {
+        day: 24 * 60 * 60 * 1000,
+        week: 7 * 24 * 60 * 60 * 1000,
+        month: 30 * 24 * 60 * 60 * 1000,
+      }
+      const range = ranges[timeRange as keyof typeof ranges]
+      if (range) {
+        filteredVideos = filteredVideos.filter(video =>
+          new Date(video.createdAt).getTime() > now.getTime() - range
+        )
+      }
+    }
+
+    // Apply sorting
+    switch (sort) {
+      case 'recent':
+        filteredVideos.sort((a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )
+        break
+      case 'popular':
+        filteredVideos.sort((a, b) => b.likes - a.likes)
+        break
+      case 'trending':
+      default:
+        // For trending, we could use a more complex algorithm combining likes, comments, shares, and recency
+        filteredVideos.sort((a, b) => {
+          const scoreA = a.likes + a.comments * 2 + a.shares * 3
+          const scoreB = b.likes + b.comments * 2 + b.shares * 3
+          return scoreB - scoreA
+        })
+    }
+
+    // Paginate results
+    const paginatedVideos = filteredVideos.slice(offset, offset + limit)
+    const totalVideos = filteredVideos.length
     const totalPages = Math.ceil(totalVideos / limit)
-    const hasMore = page < totalPages
 
-    // Return paginated response
-    return NextResponse.json({
-      data: videos,
+    // Prepare response
+    const response: PaginatedResponse<Video[]> = {
+      data: paginatedVideos,
       pagination: {
         page,
         limit,
-        totalVideos,
+        totalCount: totalVideos,
         totalPages,
-        hasMore
+        hasMore: page < totalPages,
       }
-    })
+    }
+
+    return NextResponse.json(response)
   } catch (error) {
     console.error('Failed to fetch videos:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch videos' },
-      { status: 500 }
-    )
+    const apiError: ApiError = {
+      error: 'Internal Server Error',
+      status: 500,
+      message: 'Failed to fetch videos'
+    }
+    return NextResponse.json(apiError, { status: apiError.status })
   }
 }
 
