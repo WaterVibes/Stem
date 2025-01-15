@@ -1,14 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['storage.googleapis.com'],
-  },
-  typescript: {
-    ignoreBuildErrors: false,
+    domains: ['storage.googleapis.com']
   },
   eslint: {
     ignoreDuringBuilds: false,
-    dirs: ['app', 'components', 'lib', 'src']
+    dirs: ['pages', 'components', 'lib', 'app', 'src']
   }
 };
 

@@ -31,25 +31,25 @@ export default function Sidebar() {
       id: '1',
       username: 'hydracam',
       displayName: 'HydraCam',
-      avatar: '/hydracam-avatar.jpg'
+      avatar: '/avatars/hydracam-avatar.svg'
     },
     {
       id: '2',
       username: 'oklamaruski',
       displayName: 'Kendrick Lamar✓',
-      avatar: '/oklamaruski-avatar.jpg'
+      avatar: '/avatars/oklamaruski-avatar.svg'
     },
     {
       id: '3',
       username: 'amandaasumme',
-      displayName: 'Amanda + 🎮',
-      avatar: '/amanda-avatar.jpg'
+      displayName: 'Amanda + ��',
+      avatar: '/avatars/amanda-avatar.svg'
     },
     {
       id: '4',
       username: 'squirrel.games0',
       displayName: 'Squirrel games',
-      avatar: '/squirrel-avatar.jpg'
+      avatar: '/avatars/squirrel-avatar.svg'
     }
   ];
 
