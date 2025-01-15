@@ -1,6 +1,9 @@
 "use client";
 
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
+import { Dialog, Transition } from '@headlessui/react';
+import { XMarkIcon, UserIcon } from '@heroicons/react/24/outline';
+import { useAuth } from '../context/auth-context';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -12,113 +15,151 @@ export default function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps
   const [showCredentials, setShowCredentials] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const { login } = useAuth();
 
-  if (!isOpen) return null;
-
-  const handleCredentialsSubmit = (e: React.FormEvent) => {
+  const handleCredentialsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // For demo purposes, any email/password combination works
-    if (email && password) {
+    if (!email || !password) return;
+
+    try {
+      setError('');
+      await login(email, password);
       onLogin();
       onClose();
+    } catch (error) {
+      setError('Invalid email or password');
+      console.error('Login failed:', error);
     }
   };
 
-  const handleSocialLogin = () => {
-    onLogin();
-    onClose();
-  };
-
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
-      <div className="bg-[#1D1D1D] rounded-lg w-full max-w-md p-6 relative">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-white/60 hover:text-white"
+    <Transition appear show={isOpen} as={Fragment}>
+      <Dialog as="div" className="relative z-50" onClose={onClose}>
+        <Transition.Child
+          as={Fragment}
+          enter="ease-out duration-300"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="ease-in duration-200"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+          <div className="fixed inset-0 bg-black/80" />
+        </Transition.Child>
 
-        <h2 className="text-2xl font-semibold mb-6 text-center">Log in to Stem</h2>
+        <div className="fixed inset-0 overflow-y-auto">
+          <div className="flex min-h-full items-center justify-center p-4">
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-0 scale-95"
+            >
+              <Dialog.Panel className="w-full max-w-md transform overflow-hidden bg-black border border-[#00ff9d]/20 p-6 text-left align-middle shadow-xl transition-all">
+                <div className="flex justify-between items-center mb-4">
+                  <Dialog.Title as="h3" className="text-2xl font-bold gradient-text">
+                    Welcome to Stem
+                  </Dialog.Title>
+                  <button
+                    onClick={onClose}
+                    className="text-[#00ff9d]/60 hover:text-[#00ff9d]"
+                  >
+                    <XMarkIcon className="w-5 h-5" />
+                  </button>
+                </div>
 
-        <div className="space-y-4">
-          {showCredentials ? (
-            <form onSubmit={handleCredentialsSubmit} className="space-y-4">
-              <div>
-                <input
-                  type="email"
-                  placeholder="Email or username"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 bg-white/10 rounded-lg focus:outline-none focus:ring-1 focus:ring-green-500"
-                  required
-                />
-              </div>
-              <div>
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 bg-white/10 rounded-lg focus:outline-none focus:ring-1 focus:ring-green-500"
-                  required
-                />
-              </div>
-              <button
-                type="submit"
-                className="w-full px-4 py-3 bg-green-500 text-black rounded-lg font-medium hover:bg-green-400"
-              >
-                Log in
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowCredentials(false)}
-                className="w-full px-4 py-3 bg-white/10 rounded-lg hover:bg-white/20"
-              >
-                Back to login options
-              </button>
-            </form>
-          ) : (
-            <>
-              <button
-                onClick={() => setShowCredentials(true)}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white/10 rounded-lg hover:bg-white/20"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-                Use email / username
-              </button>
+                <div className="mt-4 space-y-4">
+                  {showCredentials ? (
+                    <form onSubmit={handleCredentialsSubmit} className="space-y-4">
+                      {error && (
+                        <div className="bg-red-500/10 text-red-500 p-3 border border-red-500/20">
+                          {error}
+                        </div>
+                      )}
+                      <div>
+                        <input
+                          type="email"
+                          placeholder="Email or username"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="w-full px-4 py-3 bg-black border border-[#00ff9d]/20 focus:outline-none focus:border-[#00ff9d] focus:ring-1 focus:ring-[#00ff9d] transition-all hover-scale text-[#00ff9d]"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <input
+                          type="password"
+                          placeholder="Password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="w-full px-4 py-3 bg-black border border-[#00ff9d]/20 focus:outline-none focus:border-[#00ff9d] focus:ring-1 focus:ring-[#00ff9d] transition-all hover-scale text-[#00ff9d]"
+                          required
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        className="w-full px-4 py-3 bg-[#00ff9d] text-black font-medium hover:bg-[#00ff9d]/90 transition-colors"
+                      >
+                        Log in
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowCredentials(false)}
+                        className="w-full px-4 py-3 bg-black border border-[#00ff9d]/20 hover:border-[#00ff9d] transition-colors text-[#00ff9d]"
+                      >
+                        Back to login options
+                      </button>
+                    </form>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => setShowCredentials(true)}
+                        className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-black border border-[#00ff9d]/20 hover:border-[#00ff9d] transition-colors text-[#00ff9d]"
+                      >
+                        <UserIcon className="w-5 h-5" />
+                        Use email / username
+                      </button>
 
-              <button
-                onClick={handleSocialLogin}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white/10 rounded-lg hover:bg-white/20"
-              >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z" />
-                </svg>
-                Continue with Twitter
-              </button>
+                      <div className="relative">
+                        <div className="absolute inset-0 flex items-center">
+                          <div className="w-full border-t border-[#00ff9d]/20"></div>
+                        </div>
+                        <div className="relative flex justify-center text-sm">
+                          <span className="px-2 bg-black text-[#00ff9d]/60">Or continue with</span>
+                        </div>
+                      </div>
 
-              <button
-                onClick={handleSocialLogin}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-white/10 rounded-lg hover:bg-white/20"
-              >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                </svg>
-                Continue with Facebook
-              </button>
-            </>
-          )}
+                      <button
+                        onClick={() => {
+                          // Mock social login
+                          login('demo@example.com', 'password').then(() => {
+                            onLogin();
+                            onClose();
+                          });
+                        }}
+                        className="w-full flex items-center justify-center gap-3 px-4 py-3 bg-[#00ff9d] text-black font-medium hover:bg-[#00ff9d]/90 transition-colors"
+                      >
+                        <svg className="w-5 h-5" viewBox="0 0 24 24">
+                          <path fill="currentColor" d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"/>
+                        </svg>
+                        Continue with Google
+                      </button>
+                    </>
+                  )}
+                </div>
+
+                <p className="mt-4 text-sm text-[#00ff9d]/60">
+                  By continuing, you agree to Stem's Terms of Service and acknowledge that you've read our Privacy Policy
+                </p>
+              </Dialog.Panel>
+            </Transition.Child>
+          </div>
         </div>
-
-        <p className="text-sm text-white/40 text-center mt-6">
-          By continuing, you agree to Stem&apos;s Terms of Service and acknowledge Stem&apos;s Privacy Policy
-        </p>
-      </div>
-    </div>
+      </Dialog>
+    </Transition>
   );
 } 

@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import LoginModal from './LoginModal';
+import { useAuth } from '../context/auth-context';
 
 interface MenuItem {
   label: string;
@@ -25,32 +26,32 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { user, logout } = useAuth();
 
   const followingAccounts: FollowingAccount[] = [
     {
       id: '1',
       username: 'hydracam',
       displayName: 'HydraCam',
-      avatar: '/avatars/hydracam-avatar.svg'
+      avatar: '/images/default-avatar.png'
     },
     {
       id: '2',
       username: 'oklamaruski',
       displayName: 'Kendrick Lamar✓',
-      avatar: '/avatars/oklamaruski-avatar.svg'
+      avatar: '/images/default-avatar.png'
     },
     {
       id: '3',
       username: 'amandaasumme',
-      displayName: 'Amanda + ��',
-      avatar: '/avatars/amanda-avatar.svg'
+      displayName: 'Amanda + ',
+      avatar: '/images/default-avatar.png'
     },
     {
       id: '4',
       username: 'squirrel.games0',
       displayName: 'Squirrel games',
-      avatar: '/avatars/squirrel-avatar.svg'
+      avatar: '/images/default-avatar.png'
     }
   ];
 
@@ -116,10 +117,10 @@ export default function Sidebar() {
     }
   ];
 
-  const currentMenuItems = isLoggedIn ? loggedInMenuItems : menuItems;
+  const currentMenuItems = user ? loggedInMenuItems : menuItems;
 
   const handleLogout = () => {
-    setIsLoggedIn(false);
+    logout();
     if (pathname !== '/') {
       router.push('/');
     }
@@ -127,71 +128,49 @@ export default function Sidebar() {
 
   return (
     <>
-      <div className="fixed top-0 left-0 h-full w-60 bg-black border-r border-white/10 flex flex-col">
-        {/* Logo - Keep fixed at top */}
-        <div className="p-6 bg-black border-b border-white/10">
-          <Link href="/" className="block">
-            <h1 className="text-2xl font-bold text-green-500">Stem</h1>
-          </Link>
-        </div>
-
-        {/* Scrollable container for the rest of the content */}
+      <div className="fixed top-0 left-0 h-full w-60 bg-black border-r border-[#00ff9d]/20 flex flex-col pt-16">
+        {/* Scrollable container for the content */}
         <div className="flex-1 overflow-y-auto">
           {/* Main Navigation */}
           <nav>
-            <ul className="space-y-2 px-2">
+            <ul className="space-y-2 px-2 py-4">
               {currentMenuItems.map((item) => (
                 <li key={item.label}>
                   <Link
                     href={item.path}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg ${
+                    className={`flex items-center gap-3 px-4 py-3 rounded-none hover-scale ${
                       pathname === item.path
-                        ? 'bg-white/10'
-                        : 'hover:bg-white/5'
+                        ? 'bg-[#00ff9d]/10 text-[#00ff9d] hover-glow border border-[#00ff9d]/50'
+                        : 'hover:bg-[#00ff9d]/5 hover:text-[#00ff9d] border border-transparent'
                     }`}
                   >
-                    {item.icon}
+                    <div className={pathname === item.path ? 'text-[#00ff9d]' : 'text-white'}>
+                      {item.icon}
+                    </div>
                     <span className="font-medium">{item.label}</span>
                     {item.badge && (
-                      <span className="ml-auto bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                      <span className="ml-auto bg-[#b537f2] text-white text-xs px-1.5 py-0.5 animate-pulse">
                         {item.badge}
                       </span>
                     )}
                   </Link>
                 </li>
               ))}
-              {isLoggedIn && (
-                <li>
-                  <Link
-                    href="/profile"
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg ${
-                      pathname === '/profile'
-                        ? 'bg-white/10'
-                        : 'hover:bg-white/5'
-                    }`}
-                  >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    <span className="font-medium">Profile</span>
-                  </Link>
-                </li>
-              )}
             </ul>
           </nav>
 
-          {/* Following Accounts - Only show when logged in */}
-          {isLoggedIn && (
-            <div className="px-2 py-4 border-t border-white/10">
-              <h3 className="px-4 text-sm font-medium text-white/40 mb-2">Following accounts</h3>
+          {/* Following Accounts */}
+          {user && (
+            <div className="px-2 py-4 border-t border-[#00ff9d]/20">
+              <h3 className="px-4 text-sm font-medium text-[#00ff9d]/60 mb-2">Following accounts</h3>
               <ul className="space-y-1">
                 {followingAccounts.map((account) => (
                   <li key={account.id}>
                     <Link
                       href={`/@${account.username}`}
-                      className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/5"
+                      className="flex items-center gap-3 px-4 py-2 hover:bg-[#00ff9d]/5 hover-scale border border-transparent hover:border-[#00ff9d]/20"
                     >
-                      <div className="w-8 h-8 rounded-full bg-white/10 overflow-hidden">
+                      <div className="w-8 h-8 rounded-none bg-[#00ff9d]/10 overflow-hidden hover-glow">
                         <Image
                           src={account.avatar}
                           alt={account.username}
@@ -201,8 +180,8 @@ export default function Sidebar() {
                         />
                       </div>
                       <div>
-                        <p className="font-medium leading-tight">{account.username}</p>
-                        <p className="text-sm text-white/40 leading-tight">{account.displayName}</p>
+                        <p className="font-medium leading-tight hover:text-[#00ff9d] transition-colors">{account.username}</p>
+                        <p className="text-sm text-[#00ff9d]/40 leading-tight">{account.displayName}</p>
                       </div>
                     </Link>
                   </li>
@@ -212,11 +191,11 @@ export default function Sidebar() {
           )}
 
           {/* Login/Logout Section */}
-          {isLoggedIn ? (
-            <div className="px-2 py-4 border-t border-white/10">
+          {user ? (
+            <div className="px-2 py-4 border-t border-[#00ff9d]/20">
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/5 text-red-500"
+                className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-500/5 text-red-500 hover-scale border border-transparent hover:border-red-500/20"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -225,13 +204,13 @@ export default function Sidebar() {
               </button>
             </div>
           ) : (
-            <div className="px-2 py-4 border-t border-white/10">
-              <p className="px-4 text-sm text-white/40 mb-4">
+            <div className="px-2 py-4 border-t border-[#00ff9d]/20">
+              <p className="px-4 text-sm text-[#00ff9d]/60 mb-4">
                 Log in to follow creators, like videos, and view comments.
               </p>
               <button
                 onClick={() => setIsLoginModalOpen(true)}
-                className="w-full px-4 py-3 bg-green-500 text-black rounded-lg font-medium hover:bg-green-400"
+                className="w-full px-4 py-3 bg-[#00ff9d] text-black rounded-none font-medium hover:bg-[#00ff9d]/90 hover-scale hover-glow transition-all border border-[#00ff9d]"
               >
                 Log in
               </button>
@@ -245,7 +224,6 @@ export default function Sidebar() {
         isOpen={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
         onLogin={() => {
-          setIsLoggedIn(true);
           setIsLoginModalOpen(false);
         }}
       />
