@@ -1,76 +1,69 @@
 import { create } from 'zustand'
-import { VideoWithMetrics, FeedFilters } from '@/types'
-import { RecommendationService } from '@/services/recommendationService'
+import { Video, FeedFilters, PaginatedResponse } from '@/types'
+import { api } from '@/services/api'
 
 interface FeedState {
-  videos: VideoWithMetrics[]
+  videos: Video[]
   isLoading: boolean
+  error: string | null
   filters: FeedFilters
   hasMore: boolean
-  error: string | null
-  setFilters: (filters: Partial<FeedFilters>) => Promise<void>
+  setFilters: (filters: FeedFilters) => void
   loadVideos: () => Promise<void>
   loadMoreVideos: () => Promise<void>
 }
 
-const recommendationService = new RecommendationService()
-
 export const useFeedStore = create<FeedState>((set, get) => ({
   videos: [],
   isLoading: false,
-  hasMore: true,
   error: null,
   filters: {
     sort: 'trending',
     timeRange: 'all',
   },
+  hasMore: true,
 
-  setFilters: async (newFilters) => {
-    set(state => ({
-      filters: { ...state.filters, ...newFilters },
-      videos: [], // Reset videos when filters change
-      hasMore: true,
-    }))
-    await get().loadVideos()
+  setFilters: (filters) => {
+    set({ filters, videos: [], hasMore: true })
+    get().loadVideos()
   },
 
   loadVideos: async () => {
     try {
       set({ isLoading: true, error: null })
-      const videos = await recommendationService.getTrendingVideos(get().filters)
+      const response = await api.getVideos(1, 10)
       set({
-        videos,
-        hasMore: videos.length >= 10, // Assuming 10 is the page size
+        videos: response.data,
+        hasMore: response.pagination.hasMore,
+        isLoading: false
       })
     } catch (error) {
-      set({ error: 'Failed to load videos' })
-      console.error('Failed to load videos:', error)
-    } finally {
-      set({ isLoading: false })
+      set({
+        error: 'Failed to load videos. Please try again later.',
+        isLoading: false
+      })
     }
   },
 
   loadMoreVideos: async () => {
-    const { videos, isLoading, hasMore, filters } = get()
+    const { videos, isLoading, hasMore } = get()
     if (isLoading || !hasMore) return
 
     try {
       set({ isLoading: true, error: null })
-      const newVideos = await recommendationService.getTrendingVideos({
-        ...filters,
-        // In a real app, you would pass the last video's ID or timestamp
-        // for proper pagination
+      const page = Math.ceil(videos.length / 10) + 1
+      const response = await api.getVideos(page, 10)
+      
+      set({
+        videos: [...videos, ...response.data],
+        hasMore: response.pagination.hasMore,
+        isLoading: false
       })
-
-      set(state => ({
-        videos: [...state.videos, ...newVideos],
-        hasMore: newVideos.length >= 10,
-      }))
     } catch (error) {
-      set({ error: 'Failed to load more videos' })
-      console.error('Failed to load more videos:', error)
-    } finally {
-      set({ isLoading: false })
+      set({
+        error: 'Failed to load more videos. Please try again later.',
+        isLoading: false
+      })
     }
-  },
+  }
 })) 

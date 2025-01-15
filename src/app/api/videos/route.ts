@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { Video, PaginatedResponse, ApiError } from '@/types'
+import { PaginatedResponse, Video, ApiError } from '@/types'
 
-// Mock video data - replace with real database
+// Mock video data - replace with real database queries later
 const MOCK_VIDEOS: Video[] = [
   {
     id: '1',
@@ -12,7 +12,7 @@ const MOCK_VIDEOS: Video[] = [
     likes: 1200,
     comments: 45,
     shares: 15,
-    createdAt: new Date().toISOString(),
+    createdAt: new Date('2024-01-14T12:00:00.000Z').toISOString(),
     user: {
       id: '1',
       username: '@cannabisexpert',
@@ -28,7 +28,7 @@ const MOCK_VIDEOS: Video[] = [
     likes: 890,
     comments: 32,
     shares: 25,
-    createdAt: new Date().toISOString(),
+    createdAt: new Date('2024-01-13T15:30:00.000Z').toISOString(),
     user: {
       id: '1',
       username: '@cannabisexpert',
@@ -39,30 +39,21 @@ const MOCK_VIDEOS: Video[] = [
 
 export async function GET(request: NextRequest) {
   try {
-    // Get pagination parameters
-    const searchParams = request.nextUrl.searchParams
+    const { searchParams } = new URL(request.url)
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
-    const sort = searchParams.get('sort') || 'trending'
+    const sort = searchParams.get('sort') || 'recent'
     const timeRange = searchParams.get('timeRange') || 'all'
-    const tags = searchParams.getAll('tags')
+    const tags = searchParams.get('tags')?.split(',') || []
 
-    // Calculate offset
-    const offset = (page - 1) * limit
+    // Filter by tags if provided
+    let filteredVideos = tags.length > 0
+      ? MOCK_VIDEOS.filter(video => tags.some(tag => video.tags.includes(tag)))
+      : [...MOCK_VIDEOS]
 
-    // Filter and sort videos
-    let filteredVideos = [...MOCK_VIDEOS]
-
-    // Apply tag filters
-    if (tags.length > 0) {
-      filteredVideos = filteredVideos.filter(video =>
-        tags.some(tag => video.tags.includes(tag))
-      )
-    }
-
-    // Apply time range filter
+    // Filter by time range
+    const now = new Date()
     if (timeRange !== 'all') {
-      const now = new Date()
       const ranges = {
         day: 24 * 60 * 60 * 1000,
         week: 7 * 24 * 60 * 60 * 1000,
@@ -70,38 +61,36 @@ export async function GET(request: NextRequest) {
       }
       const range = ranges[timeRange as keyof typeof ranges]
       if (range) {
-        filteredVideos = filteredVideos.filter(video =>
-          new Date(video.createdAt).getTime() > now.getTime() - range
-        )
+        filteredVideos = filteredVideos.filter(video => {
+          const videoDate = new Date(video.createdAt)
+          return now.getTime() - videoDate.getTime() <= range
+        })
       }
     }
 
-    // Apply sorting
-    switch (sort) {
-      case 'recent':
-        filteredVideos.sort((a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        )
-        break
-      case 'popular':
-        filteredVideos.sort((a, b) => b.likes - a.likes)
-        break
-      case 'trending':
-      default:
-        // For trending, we could use a more complex algorithm combining likes, comments, shares, and recency
-        filteredVideos.sort((a, b) => {
-          const scoreA = a.likes + a.comments * 2 + a.shares * 3
-          const scoreB = b.likes + b.comments * 2 + b.shares * 3
+    // Sort videos
+    filteredVideos.sort((a, b) => {
+      switch (sort) {
+        case 'recent':
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        case 'popular':
+          return b.likes - a.likes
+        case 'trending':
+          // Simple trending algorithm: likes + comments + shares
+          const scoreA = a.likes + a.comments + a.shares
+          const scoreB = b.likes + b.comments + b.shares
           return scoreB - scoreA
-        })
-    }
+        default:
+          return 0
+      }
+    })
 
-    // Paginate results
-    const paginatedVideos = filteredVideos.slice(offset, offset + limit)
+    // Calculate pagination
+    const offset = (page - 1) * limit
     const totalVideos = filteredVideos.length
     const totalPages = Math.ceil(totalVideos / limit)
+    const paginatedVideos = filteredVideos.slice(offset, offset + limit)
 
-    // Prepare response
     const response: PaginatedResponse<Video[]> = {
       data: paginatedVideos,
       pagination: {
@@ -117,11 +106,11 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Failed to fetch videos:', error)
     const apiError: ApiError = {
-      error: 'Internal Server Error',
-      status: 500,
-      message: 'Failed to fetch videos'
+      message: 'Failed to fetch videos',
+      code: 'FETCH_VIDEOS_ERROR',
+      status: 500
     }
-    return NextResponse.json(apiError, { status: apiError.status })
+    return NextResponse.json(apiError, { status: apiError.status || 500 })
   }
 }
 

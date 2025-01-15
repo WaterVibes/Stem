@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { User } from '@/types'
 
-// Mock user data - replace with real database
-const MOCK_USER: User = {
+// Mock user data for testing
+const mockUser = {
   id: '1',
   username: '@cannabisexpert',
   email: 'expert@example.com',
@@ -16,19 +15,13 @@ const MOCK_USER: User = {
 }
 
 export async function GET(request: NextRequest) {
-  try {
-    // Check for auth token
-    const token = request.headers.get('Authorization')?.split(' ')[1]
-    
-    if (!token) {
-      return NextResponse.json(null)
-    }
-
-    // In a real app, you would verify the token and fetch the user from your database
-    // For now, we'll just return the mock user
-    return NextResponse.json(MOCK_USER)
-  } catch (error) {
-    console.error('Failed to get current user:', error)
+  // Check for auth token - in a real app, verify the token
+  const authToken = request.headers.get('authorization')?.split(' ')[1]
+  
+  if (!authToken) {
     return NextResponse.json(null)
   }
+
+  // Return mock user data
+  return NextResponse.json(mockUser)
 } 

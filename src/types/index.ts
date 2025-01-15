@@ -52,9 +52,9 @@ export interface PaginatedResponse<T> {
 }
 
 export interface ApiError {
-  error: string
-  status: number
-  message?: string
+  message: string
+  code: string
+  status?: number
 }
 
 export interface VideoMetrics {

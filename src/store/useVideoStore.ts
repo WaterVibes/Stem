@@ -7,13 +7,13 @@ interface VideoState {
   unlikeVideo: (videoId: string) => Promise<void>
 }
 
-export const useVideoStore = create<VideoState>((set, get) => ({
+export const useVideoStore = create<VideoState>((set) => ({
   likedVideos: new Set(),
 
   likeVideo: async (videoId: string) => {
     try {
       await api.likeVideo(videoId)
-      set(state => ({
+      set((state) => ({
         likedVideos: new Set(Array.from(state.likedVideos).concat(videoId))
       }))
     } catch (error) {
@@ -25,11 +25,9 @@ export const useVideoStore = create<VideoState>((set, get) => ({
   unlikeVideo: async (videoId: string) => {
     try {
       await api.unlikeVideo(videoId)
-      set(state => {
-        const newLikedVideos = new Set(state.likedVideos)
-        newLikedVideos.delete(videoId)
-        return { likedVideos: newLikedVideos }
-      })
+      set((state) => ({
+        likedVideos: new Set(Array.from(state.likedVideos).filter(id => id !== videoId))
+      }))
     } catch (error) {
       console.error('Failed to unlike video:', error)
       throw error
