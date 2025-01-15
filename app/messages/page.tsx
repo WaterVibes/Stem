@@ -90,13 +90,13 @@ export default function MessagesPage() {
                 selectedChat === message.id ? 'bg-white/10' : ''
               }`}
             >
-              <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
-                <img
-                  src={message.avatar}
-                  alt={message.username}
-                  className="w-full h-full object-cover"
-                />
-              </div>
+              <Image
+                src={message.avatar}
+                alt={message.username}
+                width={48}
+                height={48}
+                className="w-12 h-12 rounded-full object-cover"
+              />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1">
                   <span className="font-medium truncate">{message.username}</span>
@@ -123,13 +123,13 @@ export default function MessagesPage() {
             {/* Chat header */}
             <div className="p-4 border-b border-white/10">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full overflow-hidden">
-                  <img
-                    src={messages.find(m => m.id === selectedChat)?.avatar}
-                    alt={messages.find(m => m.id === selectedChat)?.username}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+                <Image
+                  src={messages.find(m => m.id === selectedChat)?.avatar || '/avatars/default-avatar.svg'}
+                  alt={messages.find(m => m.id === selectedChat)?.username || 'User'}
+                  width={48}
+                  height={48}
+                  className="w-12 h-12 rounded-full object-cover"
+                />
                 <span className="font-medium">
                   {messages.find(m => m.id === selectedChat)?.username}
                 </span>

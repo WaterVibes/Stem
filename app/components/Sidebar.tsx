@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import LoginModal from './LoginModal';
@@ -191,9 +192,11 @@ export default function Sidebar() {
                       className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-white/5"
                     >
                       <div className="w-8 h-8 rounded-full bg-white/10 overflow-hidden">
-                        <img
+                        <Image
                           src={account.avatar}
                           alt={account.username}
+                          width={32}
+                          height={32}
                           className="w-full h-full object-cover"
                         />
                       </div>

@@ -116,7 +116,7 @@ export default function LoginModal({ isOpen, onClose, onLogin }: LoginModalProps
         </div>
 
         <p className="text-sm text-white/40 text-center mt-6">
-          By continuing, you agree to Stem's Terms of Service and acknowledge Stem's Privacy Policy
+          By continuing, you agree to Stem&apos;s Terms of Service and acknowledge Stem&apos;s Privacy Policy
         </p>
       </div>
     </div>

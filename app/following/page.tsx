@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import Image from 'next/image';
 
 interface Video {
   id: string;
@@ -59,13 +60,13 @@ export default function FollowingPage() {
             <div className="absolute right-4 bottom-20 flex flex-col items-center gap-6">
               {/* Profile */}
               <div className="flex flex-col items-center gap-1">
-                <button className="w-12 h-12 rounded-full overflow-hidden border-2 border-white">
-                  <img
-                    src={video.userAvatar}
-                    alt={video.username}
-                    className="w-full h-full object-cover"
-                  />
-                </button>
+                <Image
+                  src={video.userAvatar}
+                  alt={video.username}
+                  width={48}
+                  height={48}
+                  className="w-12 h-12 rounded-full object-cover"
+                />
               </div>
 
               {/* Like */}
