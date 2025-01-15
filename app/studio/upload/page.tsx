@@ -68,15 +68,15 @@ export default function UploadPage() {
             </div>
 
             <div>
-              <label className="block text-[#00ff9d]/60 mb-2">Cover</label>
-              <div className="aspect-video bg-[#00ff9d]/5 border border-[#00ff9d]/20 flex items-center justify-center">
-                <span className="text-[#00ff9d]/40">Edit cover</span>
+              <label className="block text-[#1F6B3B]/60 mb-2">Cover</label>
+              <div className="aspect-video bg-[#1F6B3B]/5 border border-[#1F6B3B]/20 flex items-center justify-center">
+                <span className="text-[#1F6B3B]/40">Edit cover</span>
               </div>
             </div>
 
             <div>
-              <label className="block text-[#00ff9d]/60 mb-2">Who can watch this video</label>
-              <select className="w-full px-4 py-2 bg-black border border-[#00ff9d]/20 focus:border-[#00ff9d] focus:ring-1 focus:ring-[#00ff9d] text-[#00ff9d]">
+              <label className="block text-[#1F6B3B]/60 mb-2">Who can watch this video</label>
+              <select className="w-full px-4 py-2 bg-black border border-[#1F6B3B]/20 focus:border-[#1F6B3B] focus:ring-1 focus:ring-[#1F6B3B] text-[#1F6B3B]">
                 <option value="public">Everyone</option>
                 <option value="friends">Friends</option>
                 <option value="private">Private</option>
@@ -84,10 +84,10 @@ export default function UploadPage() {
             </div>
 
             <div className="flex justify-between pt-4">
-              <button className="px-6 py-2 border border-[#00ff9d]/20 text-[#00ff9d] hover:bg-[#00ff9d]/5">
+              <button className="px-6 py-2 border border-[#1F6B3B]/20 text-[#1F6B3B] hover:bg-[#1F6B3B]/5">
                 Discard
               </button>
-              <button className="px-6 py-2 bg-[#00ff9d] text-black font-medium hover:bg-[#00ff9d]/90">
+              <button className="px-6 py-2 bg-[#1F6B3B] text-white font-medium hover:bg-[#1F6B3B]/80">
                 Post
               </button>
             </div>

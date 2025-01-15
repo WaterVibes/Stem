@@ -63,17 +63,17 @@ export default function PostsPage() {
         </div>
 
         {/* Posts Table */}
-        <div className="border border-[#00ff9d]/20">
+        <div className="border border-[#1F6B3B]/20">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-[#00ff9d]/20">
-                <th className="px-4 py-3 text-left font-medium text-[#00ff9d]/60">Video</th>
-                <th className="px-4 py-3 text-left font-medium text-[#00ff9d]/60">Date</th>
-                <th className="px-4 py-3 text-left font-medium text-[#00ff9d]/60">Likes</th>
-                <th className="px-4 py-3 text-left font-medium text-[#00ff9d]/60">Comments</th>
-                <th className="px-4 py-3 text-left font-medium text-[#00ff9d]/60">Shares</th>
-                <th className="px-4 py-3 text-left font-medium text-[#00ff9d]/60">Status</th>
-                <th className="px-4 py-3 text-left font-medium text-[#00ff9d]/60"></th>
+              <tr className="border-b border-[#1F6B3B]/20">
+                <th className="px-4 py-3 text-left font-medium text-[#1F6B3B]/60">Video</th>
+                <th className="px-4 py-3 text-left font-medium text-[#1F6B3B]/60">Date</th>
+                <th className="px-4 py-3 text-left font-medium text-[#1F6B3B]/60">Likes</th>
+                <th className="px-4 py-3 text-left font-medium text-[#1F6B3B]/60">Comments</th>
+                <th className="px-4 py-3 text-left font-medium text-[#1F6B3B]/60">Shares</th>
+                <th className="px-4 py-3 text-left font-medium text-[#1F6B3B]/60">Status</th>
+                <th className="px-4 py-3 text-left font-medium text-[#1F6B3B]/60"></th>
               </tr>
             </thead>
             <tbody>

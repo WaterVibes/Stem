@@ -59,7 +59,7 @@ export default function LiveTab() {
           <h1 className="text-2xl font-bold">Live</h1>
           <button
             onClick={() => window.location.href = '/stream'}
-            className="px-4 py-2 bg-green-500 text-black rounded-lg font-medium hover:bg-green-400"
+            className="px-4 py-2 bg-[#1F6B3B] text-white rounded-lg font-medium hover:bg-[#1F6B3B]/80"
           >
             Go Live
           </button>
@@ -73,7 +73,7 @@ export default function LiveTab() {
               onClick={() => setSelectedCategory(category)}
               className={`px-4 py-2 rounded-full whitespace-nowrap ${
                 selectedCategory === category
-                  ? 'bg-green-500 text-black'
+                  ? 'bg-[#1F6B3B] text-white'
                   : 'bg-white/5 hover:bg-white/10'
               }`}
             >
@@ -107,7 +107,7 @@ export default function LiveTab() {
                     <h3 className="font-medium line-clamp-1">{stream.title}</h3>
                     <p className="text-sm text-white/60">{stream.username}</p>
                   </div>
-                  <button className="shrink-0 px-3 py-1 bg-green-500 text-black text-sm rounded-full font-medium hover:bg-green-400">
+                  <button className="shrink-0 px-3 py-1 bg-[#1F6B3B] text-white text-sm rounded-full font-medium hover:bg-[#1F6B3B]/80">
                     Watch
                   </button>
                 </div>

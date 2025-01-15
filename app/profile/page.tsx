@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import EditProfileModal from '../components/EditProfileModal';
 
 interface Video {
   id: string;
@@ -13,6 +14,7 @@ interface Video {
 export default function ProfilePage() {
   const [selectedTab, setSelectedTab] = useState<'videos' | 'reposts' | 'favorites' | 'liked'>('videos');
   const [sortBy, setSortBy] = useState<'latest' | 'popular' | 'oldest'>('latest');
+  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
 
   const videos: Video[] = [
     {
@@ -74,15 +76,18 @@ export default function ProfilePage() {
             {/* Bio */}
             <p className="mt-4">Something artistic</p>
             <div className="mt-2">
-              <a href="#" className="text-green-500">@Grass App</a>
+              <a href="#" className="text-[#1F6B3B] hover:text-[#1F6B3B]/80">@Grass App</a>
             </div>
             <div className="mt-1">
-              <a href="#" className="text-green-500">TheGrassApp.com</a>
+              <a href="#" className="text-[#1F6B3B] hover:text-[#1F6B3B]/80">TheGrassApp.com</a>
             </div>
 
             {/* Action Buttons */}
             <div className="flex gap-3 mt-4">
-              <button className="px-8 py-2 bg-green-500 text-black rounded-lg font-semibold hover:bg-green-400">
+              <button 
+                onClick={() => setIsEditProfileOpen(true)}
+                className="px-8 py-2 bg-[#1F6B3B] text-white rounded-lg font-semibold hover:bg-[#1F6B3B]/80"
+              >
                 Edit profile
               </button>
               <button className="px-8 py-2 bg-white/10 rounded-lg font-semibold hover:bg-white/20">
@@ -187,6 +192,12 @@ export default function ProfilePage() {
           ))}
         </div>
       </div>
+
+      {/* Edit Profile Modal */}
+      <EditProfileModal
+        isOpen={isEditProfileOpen}
+        onClose={() => setIsEditProfileOpen(false)}
+      />
     </div>
   );
 } 

@@ -47,29 +47,29 @@ export default function StudioHomePage() {
         <div className="mb-12">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-2xl font-bold">Key metrics</h2>
-            <span className="text-[#00ff9d]/60">{timeRange}</span>
+            <span className="text-[#1F6B3B]/60">{timeRange}</span>
           </div>
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="border border-[#00ff9d]/20 p-4">
-              <h3 className="text-[#00ff9d]/60 mb-2">Video views</h3>
+            <div className="border border-[#1F6B3B]/20 p-4">
+              <h3 className="text-[#1F6B3B]/60 mb-2">Video views</h3>
               <p className="text-2xl font-bold">7</p>
-              <p className="text-sm text-[#00ff9d]">+6 vs. Jan 1 - Jan 7</p>
+              <p className="text-sm text-[#1F6B3B]">+6 vs. Jan 1 - Jan 7</p>
             </div>
-            <div className="border border-[#00ff9d]/20 p-4">
-              <h3 className="text-[#00ff9d]/60 mb-2">Profile views</h3>
+            <div className="border border-[#1F6B3B]/20 p-4">
+              <h3 className="text-[#1F6B3B]/60 mb-2">Profile views</h3>
               <p className="text-2xl font-bold">0</p>
-              <p className="text-sm text-[#00ff9d]">+0 vs. Jan 1 - Jan 7</p>
+              <p className="text-sm text-[#1F6B3B]">+0 vs. Jan 1 - Jan 7</p>
             </div>
-            <div className="border border-[#00ff9d]/20 p-4">
-              <h3 className="text-[#00ff9d]/60 mb-2">Likes</h3>
+            <div className="border border-[#1F6B3B]/20 p-4">
+              <h3 className="text-[#1F6B3B]/60 mb-2">Likes</h3>
               <p className="text-2xl font-bold">0</p>
-              <p className="text-sm text-[#00ff9d]">+0 vs. Jan 1 - Jan 7</p>
+              <p className="text-sm text-[#1F6B3B]">+0 vs. Jan 1 - Jan 7</p>
             </div>
-            <div className="border border-[#00ff9d]/20 p-4">
-              <h3 className="text-[#00ff9d]/60 mb-2">Comments</h3>
+            <div className="border border-[#1F6B3B]/20 p-4">
+              <h3 className="text-[#1F6B3B]/60 mb-2">Comments</h3>
               <p className="text-2xl font-bold">0</p>
-              <p className="text-sm text-[#00ff9d]">+0 vs. Jan 1 - Jan 7</p>
+              <p className="text-sm text-[#1F6B3B]">+0 vs. Jan 1 - Jan 7</p>
             </div>
           </div>
         </div>
@@ -80,38 +80,38 @@ export default function StudioHomePage() {
             <h2 className="text-2xl font-bold">Recent posts</h2>
           </div>
 
-          <div className="border border-[#00ff9d]/20">
+          <div className="border border-[#1F6B3B]/20">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-[#00ff9d]/20">
-                  <th className="px-4 py-3 text-left text-[#00ff9d]/60">Video</th>
-                  <th className="px-4 py-3 text-left text-[#00ff9d]/60">Views</th>
-                  <th className="px-4 py-3 text-left text-[#00ff9d]/60">Comments</th>
-                  <th className="px-4 py-3 text-left text-[#00ff9d]/60">Likes</th>
-                  <th className="px-4 py-3 text-left text-[#00ff9d]/60">Date posted</th>
+                <tr className="border-b border-[#1F6B3B]/20">
+                  <th className="px-4 py-3 text-left text-[#1F6B3B]/60">Video</th>
+                  <th className="px-4 py-3 text-left text-[#1F6B3B]/60">Views</th>
+                  <th className="px-4 py-3 text-left text-[#1F6B3B]/60">Comments</th>
+                  <th className="px-4 py-3 text-left text-[#1F6B3B]/60">Likes</th>
+                  <th className="px-4 py-3 text-left text-[#1F6B3B]/60">Date posted</th>
                 </tr>
               </thead>
               <tbody>
                 {recentPosts.map((post) => (
-                  <tr key={post.id} className="border-b border-[#00ff9d]/20 hover:bg-[#00ff9d]/5">
+                  <tr key={post.id} className="border-b border-[#1F6B3B]/20 hover:bg-[#1F6B3B]/5">
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="relative w-24 h-14 bg-[#00ff9d]/10 flex items-center justify-center">
-                          <span className="text-xs text-[#00ff9d]/40">Thumbnail</span>
+                        <div className="relative w-24 h-14 bg-[#1F6B3B]/10 flex items-center justify-center">
+                          <span className="text-xs text-[#1F6B3B]/40">Thumbnail</span>
                           <div className="absolute bottom-1 right-1 bg-black/80 px-1 text-xs">
                             {post.duration}
                           </div>
                         </div>
                         <div>
                           <p className="font-medium">{post.title}</p>
-                          <p className="text-sm text-[#00ff9d]/60">{post.visibility}</p>
+                          <p className="text-sm text-[#1F6B3B]/60">{post.visibility}</p>
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-[#00ff9d]/60">{post.views}</td>
-                    <td className="px-4 py-4 text-[#00ff9d]/60">{post.comments}</td>
-                    <td className="px-4 py-4 text-[#00ff9d]/60">{post.likes}</td>
-                    <td className="px-4 py-4 text-[#00ff9d]/60">{post.date}</td>
+                    <td className="px-4 py-4 text-[#1F6B3B]/60">{post.views}</td>
+                    <td className="px-4 py-4 text-[#1F6B3B]/60">{post.comments}</td>
+                    <td className="px-4 py-4 text-[#1F6B3B]/60">{post.likes}</td>
+                    <td className="px-4 py-4 text-[#1F6B3B]/60">{post.date}</td>
                   </tr>
                 ))}
               </tbody>

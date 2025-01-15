@@ -31,7 +31,7 @@ export default function LiveChat() {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="h-full flex flex-col">
       <div className="flex-1 overflow-y-auto space-y-4">
         {messages.map((msg) => (
           <div
@@ -93,12 +93,12 @@ export default function LiveChat() {
           type="text"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
-          className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:ring-1 focus:ring-green-500"
+          className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#1F6B3B]"
           placeholder="Send a message..."
         />
         <button
           type="submit"
-          className="px-4 py-2 bg-green-500 text-black rounded-lg font-medium hover:bg-green-400"
+          className="px-4 py-2 bg-[#1F6B3B] text-white rounded-lg font-medium hover:bg-[#1F6B3B]/80"
         >
           Send
         </button>

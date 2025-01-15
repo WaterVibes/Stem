@@ -3,12 +3,12 @@
 @tailwind utilities;
 
 :root {
-  --neon-green: #00ff9d;
+  --grass-green: #1F6B3B;
   --neon-blue: #00f0ff;
   --neon-purple: #b537f2;
   --dark-bg: #0a0a0a;
   --cyber-black: #000000;
-  --cyber-glow: 0 0 10px rgba(0, 255, 157, 0.5);
+  --cyber-glow: 0 0 10px rgba(31, 107, 59, 0.5);
 }
 
 body {
@@ -28,7 +28,7 @@ body::before {
   background: 
     linear-gradient(90deg, var(--cyber-black) 21px, transparent 1%) center,
     linear-gradient(var(--cyber-black) 21px, transparent 1%) center,
-    var(--neon-green);
+    var(--grass-green);
   background-size: 22px 22px;
   opacity: 0.1;
   pointer-events: none;
@@ -50,21 +50,21 @@ body::before {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(0, 255, 157, 0.1);
+  background: rgba(31, 107, 59, 0.1);
   border-radius: 0;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--neon-green);
+  background: var(--grass-green);
   border-radius: 0;
-  border: 1px solid rgba(0, 255, 157, 0.5);
+  border: 1px solid rgba(31, 107, 59, 0.5);
 }
 
 /* Glassmorphism with cyber effect */
 .glass-effect {
   background: rgba(10, 10, 10, 0.95);
-  border: 1px solid rgba(0, 255, 157, 0.2);
-  box-shadow: inset 0 0 20px rgba(0, 255, 157, 0.1);
+  border: 1px solid rgba(31, 107, 59, 0.2);
+  box-shadow: inset 0 0 20px rgba(31, 107, 59, 0.1);
 }
 
 /* Cyber hover effects */
@@ -74,21 +74,21 @@ body::before {
 }
 
 .hover-glow:hover {
-  box-shadow: 0 0 20px rgba(0, 255, 157, 0.4);
+  box-shadow: 0 0 20px rgba(31, 107, 59, 0.4);
 }
 
 /* Cyberpunk gradient text */
 .gradient-text {
-  background: linear-gradient(90deg, var(--neon-green), var(--neon-blue));
+  background: linear-gradient(90deg, var(--grass-green), var(--neon-blue));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  text-shadow: 0 0 8px rgba(0, 255, 157, 0.5);
+  text-shadow: 0 0 8px rgba(31, 107, 59, 0.5);
 }
 
 /* Header styles */
 .header-bar {
-  @apply fixed top-0 left-0 right-0 h-16 bg-black border-b border-[#00ff9d]/20 z-[100];
+  @apply fixed top-0 left-0 right-0 h-16 bg-black border-b border-[#1F6B3B]/20 z-[100];
 }
 
 .header-content {
@@ -100,7 +100,7 @@ body::before {
 }
 
 .search-input {
-  @apply w-full bg-[#0a0a0a] border border-[#00ff9d]/20 rounded-none px-4 py-2 pr-10 text-white placeholder-gray-500 focus:outline-none focus:border-[#00ff9d] focus:ring-1 focus:ring-[#00ff9d] transition-all;
+  @apply w-full bg-[#0a0a0a] border border-[#1F6B3B]/20 rounded-none px-4 py-2 pr-10 text-white placeholder-gray-500 focus:outline-none focus:border-[#1F6B3B] focus:ring-1 focus:ring-[#1F6B3B] transition-all;
 }
 
 .search-icon {
@@ -112,7 +112,7 @@ body::before {
 }
 
 .header-button {
-  @apply px-4 py-2 flex items-center gap-2 text-white hover:text-[#00ff9d] transition-colors;
+  @apply px-4 py-2 flex items-center gap-2 text-white hover:text-[#1F6B3B] transition-colors;
 }
 
 .user-menu {
@@ -131,7 +131,7 @@ body::before {
   margin-top: 0.5rem;
   width: 12rem;
   background-color: black;
-  border: 1px solid rgba(0, 255, 157, 0.2);
+  border: 1px solid rgba(31, 107, 59, 0.2);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   visibility: hidden;
   opacity: 0;
@@ -139,7 +139,7 @@ body::before {
 }
 
 .menu-item {
-  @apply flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-[#00ff9d]/10 hover:text-[#00ff9d] transition-colors;
+  @apply flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-[#1F6B3B]/10 hover:text-[#1F6B3B] transition-colors;
 }
 
 /* Hide scrollbar but maintain functionality */

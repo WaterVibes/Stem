@@ -149,7 +149,7 @@ export default function Sidebar() {
                     </div>
                     <span className="font-medium">{item.label}</span>
                     {item.badge && (
-                      <span className="ml-auto bg-[#b537f2] text-white text-xs px-1.5 py-0.5 animate-pulse">
+                      <span className="ml-auto bg-red-500 text-white text-xs px-1.5 py-0.5 animate-pulse">
                         {item.badge}
                       </span>
                     )}
