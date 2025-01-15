@@ -62,9 +62,9 @@ export async function GET(
 
     if (!user) {
       const error: ApiError = {
-        error: 'User not found',
-        status: 404,
-        message: `No user found with ID: ${params.id}`
+        code: 'USER_NOT_FOUND',
+        message: `No user found with ID: ${params.id}`,
+        status: 404
       }
       return NextResponse.json(error, { status: error.status })
     }
@@ -104,11 +104,11 @@ export async function GET(
 
     return NextResponse.json(response)
   } catch (error) {
-    console.error('Failed to fetch user:', error)
+    console.error('Error fetching user:', error)
     const apiError: ApiError = {
-      error: 'Internal Server Error',
-      status: 500,
-      message: 'Failed to fetch user data'
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Internal server error',
+      status: 500
     }
     return NextResponse.json(apiError, { status: apiError.status })
   }
@@ -124,9 +124,9 @@ export async function PATCH(
 
     if (!user) {
       const error: ApiError = {
-        error: 'User not found',
-        status: 404,
-        message: `No user found with ID: ${params.id}`
+        code: 'USER_NOT_FOUND',
+        message: `No user found with ID: ${params.id}`,
+        status: 404
       }
       return NextResponse.json(error, { status: error.status })
     }
@@ -137,9 +137,9 @@ export async function PATCH(
 
     if (invalidFields.length > 0) {
       const error: ApiError = {
-        error: 'Invalid fields',
-        status: 400,
-        message: `Cannot update the following fields: ${invalidFields.join(', ')}`
+        code: 'INVALID_FIELDS',
+        message: `Cannot update the following fields: ${invalidFields.join(', ')}`,
+        status: 400
       }
       return NextResponse.json(error, { status: error.status })
     }
@@ -158,9 +158,9 @@ export async function PATCH(
   } catch (error) {
     console.error('Failed to update user:', error)
     const apiError: ApiError = {
-      error: 'Internal Server Error',
-      status: 500,
-      message: 'Failed to update user data'
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'Failed to update user data',
+      status: 500
     }
     return NextResponse.json(apiError, { status: apiError.status })
   }
