@@ -1,16 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'storage.googleapis.com',
-        pathname: '/your-bucket/**',
-      },
-    ],
+    domains: ['storage.googleapis.com'],
   },
-  reactStrictMode: true,
-  swcMinify: true,
-}
+  typescript: {
+    ignoreBuildErrors: false,
+  }
+};
 
-module.exports = nextConfig 
+module.exports = nextConfig; 
