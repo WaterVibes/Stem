@@ -40,7 +40,7 @@ export default function LoginPage() {
             Welcome back
           </h2>
           <p className="mt-2 text-center text-sm text-gray-400">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link
               href="/signup"
               className="font-medium text-emerald-400 hover:text-emerald-300 transition-colors"

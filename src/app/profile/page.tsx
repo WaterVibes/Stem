@@ -7,6 +7,7 @@ import { PencilIcon } from '@heroicons/react/24/outline'
 import EditProfileModal from '@/components/EditProfileModal'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { useAuthStore } from '@/store/useAuthStore'
+import Image from 'next/image'
 
 export default function ProfilePage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
@@ -14,13 +15,6 @@ export default function ProfilePage() {
   const [isLoading, setIsLoading] = useState(true)
   const { user } = useAuthStore()
   const api = useApi()
-
-  // Load user's videos
-  useEffect(() => {
-    if (user?.id) {
-      loadUserVideos()
-    }
-  }, [user?.id])
 
   const loadUserVideos = async () => {
     if (!user?.id) return
@@ -34,6 +28,10 @@ export default function ProfilePage() {
       setIsLoading(false)
     }
   }
+
+  useEffect(() => {
+    loadUserVideos();
+  }, [loadUserVideos]);
 
   const handleProfileUpdate = async (updates: Partial<User>) => {
     if (!user?.id) return
@@ -55,9 +53,11 @@ export default function ProfilePage() {
         <div className="flex items-start gap-8 mb-12">
           {/* Avatar */}
           <div className="relative">
-            <img
+            <Image
               src={user.avatar || '/default-avatar.png'}
               alt={user.username}
+              width={128}
+              height={128}
               className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-lg"
             />
           </div>
@@ -117,9 +117,11 @@ export default function ProfilePage() {
                 className="aspect-[9/16] relative rounded-lg overflow-hidden group cursor-pointer"
               >
                 {/* Thumbnail */}
-                <img
+                <Image
                   src={video.thumbnail}
                   alt={video.caption}
+                  width={320}
+                  height={568}
                   className="w-full h-full object-cover"
                 />
 

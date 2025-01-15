@@ -15,7 +15,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   useEffect(() => {
     checkAuth()
-  }, [])
+  }, [checkAuth])
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -23,7 +23,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
       sessionStorage.setItem('redirectUrl', pathname)
       router.push('/login')
     }
-  }, [user, isLoading, pathname])
+  }, [user, isLoading, pathname, router])
 
   // Show loading state
   if (isLoading) {

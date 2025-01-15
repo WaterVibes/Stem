@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useCallback } from 'react'
 import { useFeedStore } from '@/store/useFeedStore'
 import VideoCard from './VideoCard'
 import { SortOption } from '@/types'
@@ -9,20 +9,20 @@ export default function VideoFeed() {
   const { videos, isLoading, error, filters, setFilters, loadVideos, loadMoreVideos } = useFeedStore()
 
   useEffect(() => {
-    loadVideos()
-  }, [filters])
+    loadVideos();
+  }, [filters, loadVideos]);
 
-  const handleScroll = () => {
-    const bottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight
+  const handleScroll = useCallback(() => {
+    const bottom = Math.ceil(window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight;
     if (bottom) {
-      loadMoreVideos()
+      loadMoreVideos();
     }
-  }
+  }, [loadMoreVideos]);
 
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
 
   const sortOptions: { value: SortOption; label: string }[] = [
     { value: 'trending', label: 'Trending' },

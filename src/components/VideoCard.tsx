@@ -12,6 +12,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { HeartIcon as HeartIconSolid } from '@heroicons/react/24/solid'
 import CommentsModal from './CommentsModal'
+import Image from 'next/image'
 
 interface VideoCardProps {
   video: Video
@@ -107,10 +108,12 @@ export default function VideoCard({ video, isActive }: VideoCardProps) {
       <div className="p-4">
         {/* User Info */}
         <div className="flex items-center gap-3 mb-3">
-          <img
+          <Image
             src={video.user.avatar}
             alt={video.user.username}
-            className="w-10 h-10 rounded-full border-2 border-emerald-500/20"
+            width={40}
+            height={40}
+            className="w-10 h-10 rounded-full border-2 border-emerald-500/20 object-cover"
           />
           <div>
             <h3 className="font-medium text-emerald-400">

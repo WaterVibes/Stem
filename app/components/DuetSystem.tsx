@@ -81,7 +81,7 @@ export default function DuetSystem({ onClose }: DuetSystemProps) {
                 </div>
                 <div style={layout.partnerStream} className="relative">
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <span className="text-white/40">Partner's Stream</span>
+                    <span className="text-white/40">Partner&apos;s Stream</span>
                   </div>
                 </div>
               </>
