@@ -22,12 +22,12 @@ const categories = [
 export default function ExplorePage() {
   return (
     <div className="min-h-screen">
-      <h1 className="fixed top-[4.5rem] left-60 right-0 px-4 py-3 font-semibold text-xl bg-black border-b border-[#00ff9d]/20 z-[80]">
+      <h1 className="fixed top-[4.5rem] left-60 right-0 px-4 py-3 font-semibold text-xl bg-black border-b border-[#00ff9d]/20 z-[40]">
         Trending today
       </h1>
 
       {/* Categories */}
-      <div className="fixed top-[8rem] left-60 right-0 bg-black z-[80] border-b border-[#00ff9d]/20">
+      <div className="fixed top-[8rem] left-60 right-0 bg-black z-[40] border-b border-[#00ff9d]/20">
         <div className="overflow-x-auto no-scrollbar">
           <div className="flex whitespace-nowrap px-4 py-2">
             {categories.map((category) => (
